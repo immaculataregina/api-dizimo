@@ -3,7 +3,7 @@
 require('dotenv').config();
 // const Error = require('../utils/errors');
 
-const PessoasModel = require('../models/dizimo.model');
+const DizimoModel = require('../models/dizimo.model');
 const axios = require('axios');
 
 exports.cadastrarContribuicao = async (req, res) => {
@@ -42,27 +42,53 @@ exports.cadastrarContribuicao = async (req, res) => {
 
 }
 
-
-exports.buscarDadosDashboard = async (req, res) => {
-
+exports.cadastrarTentativaContribuicao = async (req, res) => {
     const schema = req.headers.schema;
-    let idPessoa = req.params.idPessoa;
+
+    // Dados
+    const idPessoa = req.params.idPessoa
 
     try {
 
-        let dados = await PessoasModel.buscarDadosDashboard(
-            schema,
+       // Insere a contribuição
+        const objInsert = {
             idPessoa
+        }
+
+        await DizimoModel.cadastrarTentativaContribuicao(
+            objInsert,
+            schema
         )
 
-        dados = dados[0]
-
-        return res.status(200).json({ dados })
+        res.status(200).json({ message: 'Cadastro realizado com sucesso!' })
 
     } catch (error) {
-
-        return res.status(500).json({ message: error })
-
+        res.status(500).json({ error })
     }
-    
+
 }
+
+
+// exports.buscarDadosDashboard = async (req, res) => {
+
+//     const schema = req.headers.schema;
+//     let idPessoa = req.params.idPessoa;
+
+//     try {
+
+//         let dados = await PessoasModel.buscarDadosDashboard(
+//             schema,
+//             idPessoa
+//         )
+
+//         dados = dados[0]
+
+//         return res.status(200).json({ dados })
+
+//     } catch (error) {
+
+//         return res.status(500).json({ message: error })
+
+//     }
+    
+// }

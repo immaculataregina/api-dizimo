@@ -41,30 +41,53 @@ exports.cadastrarContribuicao = async (obj, schema) => {
 	}
 }
 
-exports.buscarDadosDashboard = async (schema, idPessoa) => {
+exports.cadastrarTentativaContribuicao = async (obj, schema) => {
 	try {
 
-		const query =
+		// Cadastrar pessoa
+		let query =
 			`
-			SELECT p.apelido,
-			p.foto,
-			STRING_AGG(im.titulo_menu, ', ') AS itens_menu
-			FROM ${schema}.pessoas p
-			INNER JOIN perfil_pessoa pp
-			ON pp.id_perfil_pessoa = p.id_perfil_pessoa
-			INNER JOIN itens_menu im
-			ON im.id_item_menu = ANY(pp.ids_itens_menu)
-			WHERE p.id_pessoa = ${idPessoa}
-			GROUP BY p.apelido,
-			p.foto
+			INSERT INTO ${schema}.tentativa_contribuicao
+			(
+				id_pessoa,
+				dt_cadastro
+			)
+			VALUES
+			(
+				${obj.idPessoa},
+				'${await formatDate(new Date())}'
+			)
 			`;
-		
-		return await db.buscar(query);
-		
+		return await db.executar(query);
 	} catch (e) {
 		throw new Error(e);
 	}
 }
+
+// exports.buscarDadosDashboard = async (schema, idPessoa) => {
+// 	try {
+
+// 		const query =
+// 			`
+// 			SELECT p.apelido,
+// 			p.foto,
+// 			STRING_AGG(im.titulo_menu, ', ') AS itens_menu
+// 			FROM ${schema}.pessoas p
+// 			INNER JOIN perfil_pessoa pp
+// 			ON pp.id_perfil_pessoa = p.id_perfil_pessoa
+// 			INNER JOIN itens_menu im
+// 			ON im.id_item_menu = ANY(pp.ids_itens_menu)
+// 			WHERE p.id_pessoa = ${idPessoa}
+// 			GROUP BY p.apelido,
+// 			p.foto
+// 			`;
+		
+// 		return await db.buscar(query);
+		
+// 	} catch (e) {
+// 		throw new Error(e);
+// 	}
+// }
 
 async function formatDate(date) {
 	const year = date.getFullYear();

@@ -6,6 +6,8 @@ const controller = require('../controllers/dizimo.controller');
 
 router.post('/nova-contribuicao/:idPessoa', controller.cadastrarContribuicao)
 
-router.get('/busca-dashboard/:idPessoa', controller.buscarDadosDashboard)
+router.post('/nova-tentativa-contribuicao/:idPessoa', controller.cadastrarTentativaContribuicao)
+
+// router.get('/busca-dashboard/:idPessoa', controller.buscarDadosDashboard)
 
 module.exports = router;
