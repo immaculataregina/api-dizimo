@@ -68,27 +68,66 @@ exports.cadastrarTentativaContribuicao = async (req, res) => {
 
 }
 
+exports.cadastrarHistoricoDizimista = async (req, res) => {
+    const schema = req.headers.schema;
 
-// exports.buscarDadosDashboard = async (req, res) => {
+    // Dados
+    const orderId = req.body.orderId;
+    const idPessoa = req.body.idPessoa;
+    const atual = true;
+    const status = req.body.status;
+    const valor = req.body.valor;
+    const dtStatus = req.body.dtStatus;
 
-//     const schema = req.headers.schema;
-//     let idPessoa = req.params.idPessoa;
+    try {
 
-//     try {
+       // Insere a contribuição
+        const objInsert = {
+            orderId,
+            idPessoa,
+            atual,
+            status,
+            valor,
+            dtStatus
+        }
 
-//         let dados = await PessoasModel.buscarDadosDashboard(
-//             schema,
-//             idPessoa
-//         )
+        await DizimoModel.cadastrarHistoricoDizimista(
+            objInsert,
+            schema
+        )
 
-//         dados = dados[0]
+        res.status(200).json({ message: 'Status de pagamento atualizado!' })
 
-//         return res.status(200).json({ dados })
+    } catch (error) {
+        res.status(500).json({ error })
+    }
 
-//     } catch (error) {
+}
 
-//         return res.status(500).json({ message: error })
+exports.buscarDadosDashboard = async (req, res) => {
 
-//     }
+    const schema = req.headers.schema;
+    const dizimista = req.headers.dizimista;
+    let idPessoa = req.params.idPessoa;
+
+    try {
+        let gastos = await DizimoModel.buscarGastos(
+            schema
+        );
+        let historicoDizimista = null;
+        if (dizimista){
+            historicoDizimista = await DizimoModel.buscarHistoricoDizimista(
+                schema,
+                idPessoa
+            )
+        } 
+
+        return res.status(200).json({ gastos, historicoDizimista })
+
+    } catch (error) {
+
+        return res.status(500).json({ message: error })
+
+    }
     
-// }
+}

@@ -64,30 +64,85 @@ exports.cadastrarTentativaContribuicao = async (obj, schema) => {
 	}
 }
 
-// exports.buscarDadosDashboard = async (schema, idPessoa) => {
-// 	try {
+exports.buscarHistoricoDizimista = async (schema, idPessoa) => {
+	try {
 
-// 		const query =
-// 			`
-// 			SELECT p.apelido,
-// 			p.foto,
-// 			STRING_AGG(im.titulo_menu, ', ') AS itens_menu
-// 			FROM ${schema}.pessoas p
-// 			INNER JOIN perfil_pessoa pp
-// 			ON pp.id_perfil_pessoa = p.id_perfil_pessoa
-// 			INNER JOIN itens_menu im
-// 			ON im.id_item_menu = ANY(pp.ids_itens_menu)
-// 			WHERE p.id_pessoa = ${idPessoa}
-// 			GROUP BY p.apelido,
-// 			p.foto
-// 			`;
+		const query =
+			`
+			SELECT *
+			FROM 
+			${schema}.historico_dizimista
+			WHERE status = 'PAID'
+			AND id_pessoa = ${idPessoa}
+			ORDER BY dt_status DESC
+			`;
 		
-// 		return await db.buscar(query);
+		return await db.buscar(query);
 		
-// 	} catch (e) {
-// 		throw new Error(e);
-// 	}
-// }
+	} catch (e) {
+		throw new Error(e);
+	}
+}
+
+exports.buscarGastos = async (schema) => {
+	try {
+
+		const query =
+			`
+			SELECT
+			*
+			FROM
+			${schema}.utilizacao_dizimo
+			ORDER BY dt_gasto DESC
+			`;
+		
+		return await db.buscar(query);
+		
+	} catch (e) {
+		throw new Error(e);
+	}
+}
+
+exports.cadastrarHistoricoDizimista = async (obj, schema) => {
+	try {
+
+
+		// Cadastrar histórico
+		let query =
+			`
+			UPDATE ${schema}.historico_dizimista
+			SET atual = FALSE
+			WHERE id_pessoa = ${obj.idPessoa}
+				AND atual = TRUE
+				AND order_id IN (null, '${obj.orderId}');
+
+
+			INSERT INTO ${schema}.historico_dizimista
+			(
+				order_id, 
+				id_pessoa, 
+				atual, 
+				status, 
+				valor,
+				dt_status
+			)
+			VALUES
+			(
+				'${obj.orderId}',
+				${obj.idPessoa},
+				${obj.atual},
+				'${obj.status}',
+				${obj.valor},
+				'${obj.dtStatus}'
+			)
+			`;
+
+		return await db.executar(query);
+
+	} catch (e) {
+		throw new Error(e);
+	}
+}
 
 async function formatDate(date) {
 	const year = date.getFullYear();
