@@ -2,7 +2,7 @@ runtime: nodejs18
 
 env_variables:
   # Application
-  NAME: 'api-pessoas'
+  NAME: 'api-dizimo'
   VERSION: '1.0.0'
   NODE_ENV: 'develop'
   # DATABASE
